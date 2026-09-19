@@ -39,16 +39,16 @@
 ### 快速开始
 
 ##### 1. 克隆项目到本地
-```git clone https://github.com/likTime/视频嗅探下载器.git```
+```git clone https://github.com/likTime/Video_Sniffer_Downloader.git```
 
-```cd 视频嗅探下载器```
+```cd Video_Sniffer_Downloader```
 
 
 ##### 2. 安装依赖
 ```pip install -r requirements.txt```
 
 ##### 3. 运行程序
-```python 视频嗅探下载器.py```
+```python 嗅觉视频下载器1.9.3.py```
 
 ### 使用方法
 
@@ -102,7 +102,8 @@
 
 **Q: 扫描网站时出现"412 Client Error"或"403 Forbidden"错误怎么办？**
 
-**A:** 程序已内置模拟浏览器请求头，但某些网站的反爬策略较强。可以尝试以下方法：
+**A:** 程序已内置模拟浏览器请求头，但某些网站的反爬策略较强。
+*   v1.9.3 已针对性修复 B 站 412 风控问题：统一升级请求头至 Chrome/138 并自动生成 `buvid3` 设备指纹，命中 412 时会自动刷新 Cookie 重试。若仍遇到 412，建议升级到最新版。
 *   确保输入的URL格式正确（包含`http://`或`https://`）。
 *   程序会自动尝试修复常见的域名格式错误（如`wwwbilibilicom` -> `www.bilibili.com`）。
 *   网络环境或目标网站暂时不可访问。
@@ -115,22 +116,51 @@
 
 **A:** 当前版本主要针对公开可访问的视频内容。对于需要登录或会员的视频，程序内置的通用请求头可能权限不足。您可以尝试手动复制视频链接到剪贴板使用监控下载功能，有时可直接获取到视频流。
 
+**Q: 下载 B 站视频时提示"最高仅 720P"？**
+
+**A:** 这是 B 站对未登录用户的画质限制，并非程序缺陷。如需下载 1080P/4K，请在源码中 `USER_SESSDATA` 变量处填入你自己浏览器中的 `SESSDATA` 值（源码注释中有详细获取步骤）。
+
+**Q: 首次下载 B 站视频时程序看起来卡住了？**
+
+**A:** 程序正在自动下载 ffmpeg（约 80MB，仅需一次，用于合并 B 站 DASH 格式的分离视频流与音频流）。国内网络若直连 GitHub 失败，会自动切换 3 个国内镜像源重试，请在日志区查看实时进度。
+
 **Q: 程序无法启动或缺少模块？**
 
 **A:** 请确保已正确安装`requirements.txt`中的所有依赖（`requests`, `pyperclip`）。如果使用Linux系统，可能还需要安装Tkinter相关包（例如在Ubuntu上：`sudo apt-get install python3-tk`）。
 
 ## 更新日志
 
+### 最新版本：v1.9.3 (2026-09-12)
+
+**412风控修复 + 私人Cookie移除 + DASH三阶段进度条**
+
+*   修复 B 站 `412 Client Error: Precondition Failed` 风控拦截：统一升级请求头至 Chrome/138，运行时自动生成 `buvid3` 设备指纹，412 时自动刷新 Cookie 重试
+*   移除硬编码的私人 Cookie（SESSDATA 等登录凭据），如需高清画质改为在 `USER_SESSDATA` 变量中自行填入
+*   DASH 下载三阶段平滑进度条：视频流(0%-45%) → 音频流(45%-90%) → ffmpeg合并(90%-100%)
+
+### 历史版本
+
+*   **v1.9.2 (2026-08-10)**: FFmpeg 下载增强（4 个下载源含国内镜像）；新增"合并已有文件"按钮
+*   **v1.9.1 (2026-08-10)**: 修复标题提取失败（改用 `<title>` 备选方案）；修复封面未嵌入视频
+*   **v1.9.0 (2026-08-10)**: 新增配置记忆功能与 FFmpeg 自动下载；修复下载路径 BUG
+*   **v1.8.0 (2026-07-31)**: 新增 ffmpeg 自动合并，修复视频流被误存为 `.m4a` 的致命 BUG
+*   **v1.7.0 (2026-07-31)**: 日志颜色分级显示；修复"扫描网站"按钮无即时反馈
+*   **v1.6.x (2026-07-31)**: 修复界面卡死/崩溃（线程模型重构）；修复 AV1 编码选择问题
+*   **v1.5.0 (2026-07-28)**: 新增 B 站视频标题与封面自动下载
+*   **v1.4.0 (2026-07-28)**: 新增 B 站最高画质提取（1080P60/4K/8K/HDR）
+*   **v1.3.0 (2026-07-28)**: 剪贴板监控支持 B 站视频页面链接
 *   **v1.2.0 (2026-01-30)**: 新增下载进度条与实时速度显示；优化B站视频解析逻辑。
 *   **v1.1.0 (2025-12-27)**: 优化UI布局；增强日志系统；修复B站403错误。
 *   **v1.0.5 (2025-12-25)**: 重写为GUI界面；添加剪贴板监控与网站扫描功能。
 *   **v1.0.0 (2025-12-01)**: 初始版本发布，支持基础视频流下载。
 
-（详细更新内容请点击程序内的"更新日志"按钮查看。）
+（完整更新内容请查看 [CHANGELOG.md](CHANGELOG.md)，或点击程序内的"更新日志"按钮。）
 
 ##下载
 
 •如需查看或修改源码，可下载 `.py` 源码版本
+
+•**最新源码为 `嗅觉视频下载器1.9.3.py`**，旧版 `嗅觉视频下载器 (Video Sniffer Downloader).py` 仅作版本对照
 
 •普通用户请直接下载 `.exe` 版本（无需安装 Python 环境）
 
@@ -191,9 +221,9 @@ Video Sniffer Downloader is a powerful video downloading tool that can automatic
 
 #### 1. Clone the repository
 
-```git clone https://github.com/likTime/视频嗅探下载器.git```
+```git clone https://github.com/likTime/Video_Sniffer_Downloader.git```
 
-```cd 视频嗅觉下载器```
+```cd Video_Sniffer_Downloader```
 
 #### 2. Install dependencies
 
@@ -201,7 +231,7 @@ Video Sniffer Downloader is a powerful video downloading tool that can automatic
 
 #### 3. Run the program
 
-```python 视频嗅探下载器.py```
+```python 嗅觉视频下载器1.9.3.py```
 
 ## Usage
 
@@ -266,7 +296,8 @@ Video Sniffer Downloader is a powerful video downloading tool that can automatic
 
 **Q: Getting "412 Client Error" or "403 Forbidden" when scanning websites?**
 
-**A:** Program has built-in browser headers, but some sites have strong anti-scraping. Try:
+**A:** The program has built-in browser headers, but some sites have strong anti-scraping.
+• v1.9.3 specifically fixes Bilibili 412 errors: request headers upgraded to Chrome/138 and a random `buvid3` device fingerprint is generated at runtime, with automatic Cookie refresh and retry on 412. Please upgrade to the latest version.
 • Ensure correct URL format (http:// or https://)
 • Program auto-fixes common domain format errors
 • Check network/target site accessibility
@@ -279,6 +310,14 @@ Video Sniffer Downloader is a powerful video downloading tool that can automatic
 
 **A:** Current version targets publicly accessible content. For member-only videos, try copying direct video links to clipboard.
 
+**Q: Why does it say "720P maximum" when downloading Bilibili videos?**
+
+**A:** This is Bilibili's limitation for non-logged-in users, not a program defect. To download 1080P/4K, fill in your own `SESSDATA` value at the `USER_SESSDATA` variable in the source code (see the detailed instructions in the code comments).
+
+**Q: The program appears frozen on the first Bilibili download?**
+
+**A:** It is automatically downloading ffmpeg (~80MB, one-time only) to merge Bilibili's separated DASH video and audio streams. If GitHub is unreachable, it automatically retries via 3 domestic mirrors — check the log area for real-time progress.
+
 **Q: Program won't start or missing modules?**
 
 **A:** Ensure all dependencies in requirements.txt are installed. On Linux, may need: 
@@ -286,6 +325,25 @@ Video Sniffer Downloader is a powerful video downloading tool that can automatic
 
 ## Changelog
 
+### Latest: v1.9.3 (2026-09-12)
+
+**Bilibili 412 fix + private Cookie removal + 3-stage DASH progress bar**
+
+• Fixed Bilibili `412 Client Error: Precondition Failed`: headers upgraded to Chrome/138, runtime-generated `buvid3` fingerprint, automatic Cookie refresh and retry on 412
+• Removed hardcoded private Cookies (SESSDATA etc.); HD quality is now unlocked by filling in your own `USER_SESSDATA`
+• Smooth 3-stage DASH progress bar: video stream (0%-45%) → audio stream (45%-90%) → ffmpeg merge (90%-100%)
+
+### Previous versions
+
+• **v1.9.2 (2026-08-10)**: Enhanced FFmpeg download (4 sources incl. mirrors); added "Merge Existing Files" button
+• **v1.9.1 (2026-08-10)**: Fixed title extraction (fallback to `<title>`); fixed cover not embedded in video
+• **v1.9.0 (2026-08-10)**: Added config memory and automatic FFmpeg download; fixed download path bug
+• **v1.8.0 (2026-07-31)**: Added automatic ffmpeg merging; fixed critical bug where video streams were saved as `.m4a`
+• **v1.7.0 (2026-07-31)**: Color-coded logs; fixed missing feedback on "Scan Website"
+• **v1.6.x (2026-07-31)**: Fixed UI freeze/crash (threading model rewrite); fixed AV1 codec selection
+• **v1.5.0 (2026-07-28)**: Added automatic Bilibili title and cover download
+• **v1.4.0 (2026-07-28)**: Added Bilibili max quality extraction (1080P60/4K/8K/HDR)
+• **v1.3.0 (2026-07-28)**: Clipboard monitoring supports Bilibili video page links
 • **v1.2.0 (2026-01-30)**: Added progress bar and speed display; optimized Bilibili parsing
 
 • **v1.1.0 (2025-12-27)**: Improved UI; enhanced logs; fixed Bilibili 403 errors
@@ -294,9 +352,13 @@ Video Sniffer Downloader is a powerful video downloading tool that can automatic
 
 • **v1.0.0 (2025-12-01)**: Initial release with basic video downloading
 
+(For full details, see [CHANGELOG.md](CHANGELOG.md) or click the "Update Log" button in the program.)
+
 ##Download
 
 •For source code viewing or modification, download the `.py` source version
+
+•**The latest source is `嗅觉视频下载器1.9.3.py`**; the older `嗅觉视频下载器 (Video Sniffer Downloader).py` is kept for version reference only
 
 •For regular users, please download the `.exe` version directly (no Python environment required)
 
